@@ -1,58 +1,55 @@
 #include <opencv2/opencv.hpp>
 #include <iostream>
+#include <array>
 
-using namespace cv;
-using namespace std;
 
-int main(int argc, char* argv[])
-{
+class Camera{
+public:
+   std::array<int, 2> resolution;
+   std::string winname;
+   cv::VideoCapture cap;
 
-    // !!!!!!!!!!!!!!!!!!!!!!!!!
- //Open the default video camera
- VideoCapture cap(2);
-//  cap.set(CAP_PROP_FOURCC, ('M','P','E','G'));
-//  cap.set()
- // if not success, exit program
- if (cap.isOpened() == false) {
-    cout << "Cannot open the video camera" << endl;
-    cin.get(); //wait for any key press
-    return -1;
- } 
- double dWidth = cap.get(CAP_PROP_FRAME_WIDTH); //get the width of frames of the video
- double dHeight = cap.get(CAP_PROP_FRAME_HEIGHT); //get the height of frames of the video
+   Camera(int cam_id):
+      cap(cam_id){
+      cap.set(cv::CAP_PROP_FOURCC, ('M','P','E','G'));
 
- cout << "Resolution of the video : " << dWidth << " x " << dHeight << endl;
+      if (cap.isOpened() == false) {
+         std::cout << "[LOG ]: Cannot open the video camera" << std::endl;
+         return;
+      }
 
-// !!!!!!!!!!!!!!!!!!!!!!!!!
- string window_name = "Camera";
- namedWindow(window_name); 
- 
- while (true){
-    Mat frame;
-    bool bSuccess = cap.read(frame); // read a new frame from video 
+      double dWidth = cap.get(cv::CAP_PROP_FRAME_WIDTH); 
+      double dHeight = cap.get(cv::CAP_PROP_FRAME_HEIGHT); 
+      std::cout << "[LOG ]: Resolution of the video : " << dWidth << " x " << dHeight << std::endl; 
+   }
 
-    //Breaking the while loop if the frames cannot be captured
-    if (bSuccess == false) 
-    {
-    cout << "Video camera is disconnected" << endl;
-    cin.get(); //Wait for any key press
-    break;
-    }
+   cv::Mat getFrame(){
+      cv::Mat frame;
+      bool bSuccess = cap.read(frame); 
 
-    //show the frame in the created window
-    imshow(window_name, frame);
+      if (bSuccess == false) {
+         std::cout << "[LOG ]: Video camera is disconnected" << std::endl;
+      }
 
-    //wait for for 10 ms until any key is pressed.  
-    //If the 'Esc' key is pressed, break the while loop.
-    //If the any other key is pressed, continue the loop 
-    //If any key is not pressed withing 10 ms, continue the loop 
-    if (waitKey(10) == 27)
-    {
-    cout << "Esc key is pressed by user. Stoppig the video" << endl;
-    break;
-    }
- }
+      return frame;
+   }
 
- return 0;
+};
 
+
+
+int main(int argc, char* argv[]){
+   Camera camera(0);
+   while (true){
+      cv::Mat frame = camera.getFrame();
+
+      cv::imshow(camera.winname, frame);
+
+         if (cv::waitKey(10) == 27){
+      std::cout << "[LOG ]: Esc key is pressed by user. Stoppig the video" << std::endl;
+      break;
+      }
+   }
+   return 0;
 }
+   
