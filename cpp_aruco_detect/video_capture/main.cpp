@@ -14,12 +14,20 @@ struct CameraParams{
    }
 };
 
+<<<<<<< HEAD
 
 void printInfo(const CameraParams& par){
    std::cout << "[LOG ]:" 
    << " Cam: " << par.camId 
    << " Resolution of the video: " << par.resolution[0] << " x " << par.resolution[1] 
    << " FPS : " << par.FPS << std::endl; 
+=======
+void printResolution(const CameraParams& par){
+   std::cout << "[LOG ]:" 
+   << " Cam: " << par.camId 
+   << " Resolution of the video : " << par.resolution[0] << " x " << par.resolution[1] 
+   << " FPS :" << std::endl; 
+>>>>>>> b61d0da6ba472c88f106020d8cf41926231523a1
 }
 
 class Camera{
@@ -56,6 +64,7 @@ public:
    }
 
    CameraParams getCameraInfo(){
+<<<<<<< HEAD
       CameraParams par(0, 0, 0);
       par.resolution[0] = cap.get(cv::CAP_PROP_FRAME_WIDTH);
       par.resolution[1] = cap.get(cv::CAP_PROP_FRAME_HEIGHT);
@@ -64,6 +73,15 @@ public:
       return par; 
    }
 
+=======
+      CameraParams a;
+      a.resolution[0] = cap.get(cv::CAP_PROP_FRAME_WIDTH);
+      a.resolution[1] = cap.get(cv::CAP_PROP_FRAME_HEIGHT);
+      a.FPS = cap.get(cv::CAP_PROP_FPS);
+
+      return a; 
+   }
+>>>>>>> b61d0da6ba472c88f106020d8cf41926231523a1
 };
 
 
