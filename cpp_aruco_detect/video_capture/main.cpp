@@ -2,7 +2,7 @@
 #include <iostream>
 #include <array>
 
- //новую структуру
+ 
 
 struct CameraParams{
    int camId;
@@ -13,6 +13,14 @@ struct CameraParams{
       camId(id), resolution({width, height}){
    }
 };
+
+
+void printInfo(const CameraParams& par){
+   std::cout << "[LOG ]:" 
+   << " Cam: " << par.camId 
+   << " Resolution of the video: " << par.resolution[0] << " x " << par.resolution[1] 
+   << " FPS : " << par.FPS << std::endl; 
+}
 
 class Camera{
 public:
@@ -34,9 +42,6 @@ public:
       cap.set(cv::CAP_PROP_FRAME_WIDTH, params.resolution[0]);
       cap.set(cv::CAP_PROP_FRAME_HEIGHT, params.resolution[1]);
 
-      double dWidth = cap.get(cv::CAP_PROP_FRAME_WIDTH); //удалить
-      double dHeight = cap.get(cv::CAP_PROP_FRAME_HEIGHT); 
-      std::cout << "[LOG ]: Resolution of the video : " << dWidth << " x " << dHeight << std::endl; 
    }
 
    cv::Mat getFrame(){
@@ -50,32 +55,14 @@ public:
       return frame;
    }
 
-   CameraParams getCameraInfo(CameraParams a){
-      a.resolution[0] = cap.get(cv::CAP_PROP_FRAME_WIDTH);
-      a.resolution[1] = cap.get(cv::CAP_PROP_FRAME_HEIGHT);
-      a.FPS = cap.get(cv::CAP_PROP_FPS);
+   CameraParams getCameraInfo(){
+      CameraParams par(0, 0, 0);
+      par.resolution[0] = cap.get(cv::CAP_PROP_FRAME_WIDTH);
+      par.resolution[1] = cap.get(cv::CAP_PROP_FRAME_HEIGHT);
+      par.FPS = cap.get(cv::CAP_PROP_FPS);
 
-      return a; 
+      return par; 
    }
-
-   void printResolution(CameraParams par){
-      std::cout << "[LOG ]: Cam" << par.camId << " Resolution of the video : " << par.resolution[0]
-       << " x " << par.resolution[1]  << std::endl; 
-   }
-
-   void printResolution(){
-      std::cout << "[LOG ]: Resolution of the video : " << cap.get(cv::CAP_PROP_FRAME_WIDTH)
-       << " x " << cap.get(cv::CAP_PROP_FRAME_HEIGHT)  << std::endl; 
-   }
-
-   void printFPS(CameraParams par){
-      std::cout<<"[LOG ]: Cam" << par.camId << " " << par.FPS  << " FPS" <<std::endl;
-   }
-
-   void printFPS(){
-      std::cout<<"[LOG ]: " << cap.get(cv::CAP_PROP_FPS) << " FPS" <<std::endl;
-   }
-
 
 };
 
@@ -85,15 +72,14 @@ int main(int argc, char* argv[]){
    CameraParams par(2, 800, 600);
    Camera camera(par);
 
-   camera.printResolution(par);
+   printInfo(par);
    
    while (camera.isWorking){
       cv::Mat frame = camera.getFrame();
 
-      camera.getCameraInfo(par);
+      par = camera.getCameraInfo();
 
-      camera.printFPS();
-     
+      printInfo(par);
 
       cv::imshow(camera.winname, frame);
 
