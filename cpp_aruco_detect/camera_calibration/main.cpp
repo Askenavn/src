@@ -58,8 +58,8 @@ void calibrate(std::string a){
 
    cv::calibrateCamera(objpoints, imgpoints, cv::Size(gray.rows,gray.cols), cameraMatrix, distCoeffs, rvec, tvec);
    
-   std::cout << "cameraMatrix : "<< std::endl << cameraMatrix << std::endl;
-   std::cout << "distCoeffs : " << std::endl << distCoeffs << std::endl;
+   std::cout << "cameraMatrix : "<< std::endl << cameraMatrix << std::endl << cameraMatrix.type()<< std::endl;
+   std::cout << "distCoeffs : " << std::endl << distCoeffs << std::endl << distCoeffs.type()<< std::endl;
 
 }
 

@@ -69,66 +69,29 @@ public:
       return par; 
    }
 
-   void calibrate(std::string a){
-      int ChessBoard[2]{6,9};
+   cv::Mat setDist(std::array<double, 5> d){
+      cv::Mat dist(cv::Size(5, 1), 6);
 
-      std::vector<std::vector<cv::Point3f> > objpoints;
-      std::vector<std::vector<cv::Point2f> > imgpoints;
-      std::vector<cv::Point3f> objp;
-
-      for(int i{0}; i<ChessBoard[1]; i++){
-         for(int j{0}; j<ChessBoard[0]; j++){
-            objp.push_back(cv::Point3f(j,i,0));
-         }   
+      for (int i=0; i<5;i++){
+         dist.at<double>(i) = d[i];
       }
 
-      std::vector<cv::String> images;
+      return dist;
+   }
 
-      std::string path = a + "*.jpg";
-      cv::glob(path, images);
+      cv::Mat setCamMat(std::array<std::array<double, 3>, 3> mtx){
+      cv::Mat camMatrix(cv::Size(3, 3), 6);
 
-      cv::Mat frame, gray;
-
-      std::vector<cv::Point2f> corners;
-
-
-      bool success;
-      
-      for(int i{0}; i<images.size(); i++)
-      {
-         frame = cv::imread(images[i]);
-         cv::cvtColor(frame,gray,cv::COLOR_BGR2GRAY);
-      
-         success = cv::findChessboardCorners(gray, cv::Size(ChessBoard[0], ChessBoard[1]), 
-         corners, cv::CALIB_CB_ADAPTIVE_THRESH | cv::CALIB_CB_FAST_CHECK | cv::CALIB_CB_NORMALIZE_IMAGE);
-         
-         if(success)
-         {
-            cv::TermCriteria criteria(cv::TermCriteria::EPS | cv::TermCriteria::MAX_ITER, 30, 0.001);
-            
-            cv::cornerSubPix(gray,corners,cv::Size(11,11), cv::Size(-1,-1),criteria);
-            
-            cv::drawChessboardCorners(frame, cv::Size(ChessBoard[0], ChessBoard[1]), corners, success);
-            
-            objpoints.push_back(objp);
-            imgpoints.push_back(corners);
-         }
-         std::cout<<images[i]<<std::endl;
-         cv::imshow("Image",frame);
-         cv::waitKey(0);
+      for (int i=0; i<3;i++){
+         cv::Mat buff; 
+            for(int j=0; j<3; j++){
+               camMatrix.at<double>(i,j) = mtx[i][j];
+            }
       }
-      
-      cv::destroyAllWindows();
-      
-      cv::Mat cameraMatrix,distCoeffs,rvec,tvec;
-      
 
-      cv::calibrateCamera(objpoints, imgpoints, cv::Size(gray.rows,gray.cols), cameraMatrix, distCoeffs, rvec, tvec);
-      
-      std::cout << "cameraMatrix : " << cameraMatrix << std::endl;
-      std::cout << "distCoeffs : " << distCoeffs << std::endl;
+      return camMatrix;
+   }
 
-         }
 };
 
 
@@ -153,8 +116,6 @@ int main(int argc, char* argv[]){
          break;
       }
    }
-   
-   camera.calibrate("/home/nanzat/images/");
 
    return 0;
 }
