@@ -30,19 +30,14 @@ void calibrate(std::string a){
 
    std::vector<cv::Point2f> corners;
 
-
-   bool success;
    
    for(int i{0}; i<images.size(); i++)
    {
       frame = cv::imread(images[i]);
       cv::cvtColor(frame,gray,cv::COLOR_BGR2GRAY);
    
-      success = cv::findChessboardCorners(gray, cv::Size(ChessBoard[0], ChessBoard[1]), 
-      corners, cv::CALIB_CB_ADAPTIVE_THRESH | cv::CALIB_CB_FAST_CHECK | cv::CALIB_CB_NORMALIZE_IMAGE);
-      
-      if(success)
-      {
+      if(bool success = cv::findChessboardCorners(gray, cv::Size(ChessBoard[0], ChessBoard[1]), 
+      corners, cv::CALIB_CB_ADAPTIVE_THRESH | cv::CALIB_CB_FAST_CHECK | cv::CALIB_CB_NORMALIZE_IMAGE)){
          cv::TermCriteria criteria(cv::TermCriteria::EPS | cv::TermCriteria::MAX_ITER, 30, 0.001);
          
          cv::cornerSubPix(gray,corners,cv::Size(11,11), cv::Size(-1,-1),criteria);
