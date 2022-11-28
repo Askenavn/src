@@ -102,25 +102,27 @@ struct Marks{
    std::vector<int> ids;
    std::vector<std::vector<cv::Point2f>> corners;
 
-   Marks(std::vector<int> id, std::vector<std::vector<cv::Point2f>> corner):
-   ids(id), corners(corner){
+   
+   void detectMarks(cv::Mat frame){
+      std::vector<int> markerIds;
+      std::vector<std::vector<cv::Point2f>> markerCorners;
+
+      cv::Ptr<cv::aruco::DetectorParameters> parameters = cv::aruco::DetectorParameters::create();
+      cv::Ptr<cv::aruco::Dictionary> dictionary = cv::aruco::getPredefinedDictionary(cv::aruco::DICT_4X4_250);
+
+      cv::aruco::detectMarkers(frame, dictionary, markerCorners, markerIds, parameters);
+
+      ids = markerIds;
+      corners = markerCorners;
+   }
+
+   cv::Mat drawMarks(cv::Mat frame){
+      cv::aruco::drawDetectedMarkers(frame, corners, ids);
+
+      return frame;      
    }
 };
 
-Marks detectMarks(cv::Mat frame){
-   std::vector<int> markerIds;
-   std::vector<std::vector<cv::Point2f>> markerCorners;
-
-   cv::Ptr<cv::aruco::DetectorParameters> parameters = cv::aruco::DetectorParameters::create();
-   cv::Ptr<cv::aruco::Dictionary> dictionary = cv::aruco::getPredefinedDictionary(cv::aruco::DICT_4X4_250);
-
-   cv::aruco::detectMarkers(frame, dictionary, markerCorners, markerIds, parameters);
-
-   Marks detected(markerIds, markerCorners);
-
-
-   return detected;
-}
 
 
 
@@ -147,7 +149,8 @@ int main(int argc, char* argv[]){
 
    cv::Mat img = cv::imread("/home/nanzat/aruco_images/1.jpg");
    
-   Marks detected = detectMarks(img);
+   Marks detected;
+   detected.detectMarks(img);
    std::cout<<detected.ids.size()<<std::endl;
    std::cout<<detected.ids[0]<<std::endl<<detected.corners[0]<<std::endl;
 
@@ -155,9 +158,8 @@ int main(int argc, char* argv[]){
    cv::waitKey(0);
    cv::destroyWindow(" ");
 
-   cv::Mat detMarks = img.clone();
-   cv::aruco::drawDetectedMarkers(detMarks, detected.corners, detected.ids);
-   cv::imshow("detected markers", detMarks);
+
+   cv::imshow("detected markers", detected.drawMarks(img));
    cv::waitKey(0);
    cv::destroyWindow("detected markers");
    return 0;
