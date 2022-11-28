@@ -121,6 +121,11 @@ struct Marks{
 
       return frame;      
    }
+
+   cv::Mat drawAxis(cv::Mat frame){
+
+      
+   }
 };
 
 

@@ -5,10 +5,11 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <stdio.h>
+#include "aruco_samples_utility.hpp"
 
  
 
-void calibrate(std::string a){
+void calibrate(std::string folder, std::string file){
    int ChessBoard[2]{6,9};
 
    std::vector<std::vector<cv::Point3f> > objpoints;
@@ -23,7 +24,7 @@ void calibrate(std::string a){
 
    std::vector<cv::String> images;
 
-   std::string path = a + "*.jpg";
+   std::string path = folder + "*.jpg";
    cv::glob(path, images);
 
    cv::Mat frame, gray;
@@ -56,17 +57,29 @@ void calibrate(std::string a){
    cv::Mat cameraMatrix,distCoeffs,rvec,tvec;
    
 
-   cv::calibrateCamera(objpoints, imgpoints, cv::Size(gray.rows,gray.cols), cameraMatrix, distCoeffs, rvec, tvec);
+   double repError = cv::calibrateCamera(objpoints, imgpoints, cv::Size(gray.rows,gray.cols), 
+                                          cameraMatrix, distCoeffs, rvec, tvec);
    
-   std::cout << "cameraMatrix : "<< std::endl << cameraMatrix << std::endl << cameraMatrix.type()<< std::endl;
-   std::cout << "distCoeffs : " << std::endl << distCoeffs << std::endl << distCoeffs.type()<< std::endl;
+   std::string outputFile = file + (std::string)".yml";
 
+   bool success = saveCameraParams(outputFile, gray.size(), 1, 0, cameraMatrix,
+                                   distCoeffs, repError);
+
+   if(!success) {
+      std::cout << "[LOG ]: Cannot save output file" << std::endl;
+   }
+   else{
+      std::cout << "[LOG ]: Rep Error: " << repError << std::endl;
+      std::cout << "[LOG ]: Calibration saved to " << outputFile << std::endl;
+   }
 }
+
+
 
 
 int main(int argc, char* argv[]){
    
-   calibrate("/home/nanzat/images/");
+   calibrate("/home/nanzat/images/", "cam");
 
    return 0;
 }
