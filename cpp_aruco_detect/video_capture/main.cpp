@@ -53,6 +53,10 @@ cv::Mat setCamMat(std::array<std::array<double, 3>, 3> mtx){
    return camMatrix;
 }
 
+void readParams(std::string file, cv::Mat &mtx, cv::Mat &dist){
+   bool success = readCameraParameters(file, mtx, dist);
+
+}
 
 class Camera{
 public:
