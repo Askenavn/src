@@ -6,6 +6,7 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include <stdio.h>
+#include <opencv2/aruco.hpp>
 
  
 
@@ -19,6 +20,8 @@ struct CameraParams{
    }
 };
 
+
+
 void printInfo(const CameraParams& par){
    std::cout << "[LOG ]:" 
    << " Cam: " << par.camId 
@@ -26,6 +29,30 @@ void printInfo(const CameraParams& par){
    << " FPS : " << par.FPS << std::endl; 
 
 }
+
+cv::Mat setDist(std::array<double, 5> d){
+   cv::Mat dist(cv::Size(5, 1), 6);
+
+   for (int i=0; i<5;i++){
+      dist.at<double>(i) = d[i];
+   }
+
+   return dist;
+}
+
+cv::Mat setCamMat(std::array<std::array<double, 3>, 3> mtx){
+   cv::Mat camMatrix(cv::Size(3, 3), 6);
+
+   for (int i=0; i<3;i++){
+      cv::Mat buff; 
+         for(int j=0; j<3; j++){
+            camMatrix.at<double>(i,j) = mtx[i][j];
+         }
+   }
+
+   return camMatrix;
+}
+
 
 class Camera{
 public:
@@ -69,35 +96,40 @@ public:
       return par; 
    }
 
-   cv::Mat setDist(std::array<double, 5> d){
-      cv::Mat dist(cv::Size(5, 1), 6);
+};
 
-      for (int i=0; i<5;i++){
-         dist.at<double>(i) = d[i];
-      }
+struct Mark{
+   int id;
+   std::vector<cv::Point2f> corners;
 
-      return dist;
-   }
-
-      cv::Mat setCamMat(std::array<std::array<double, 3>, 3> mtx){
-      cv::Mat camMatrix(cv::Size(3, 3), 6);
-
-      for (int i=0; i<3;i++){
-         cv::Mat buff; 
-            for(int j=0; j<3; j++){
-               camMatrix.at<double>(i,j) = mtx[i][j];
-            }
-      }
-
-      return camMatrix;
+   Mark(int markerId, std::vector<cv::Point2f> pts):
+   id(markerId), corners(pts){
    }
 
 };
 
+std::vector<Mark> detectMarks(cv::Mat frame){
+   std::vector<int> markerIds;
+   std::vector<std::vector<cv::Point2f>> markerCorners;
+
+   cv::Ptr<cv::aruco::DetectorParameters> parameters = cv::aruco::DetectorParameters::create();
+   cv::Ptr<cv::aruco::Dictionary> dictionary = cv::aruco::getPredefinedDictionary(cv::aruco::DICT_4X4_250);
+
+   cv::aruco::detectMarkers(frame, dictionary, markerCorners, markerIds, parameters);
+
+   std::vector<Mark> detected;
+   for(int i=0; i < 4; i++){
+      Mark buff(markerIds[i], markerCorners[i]);
+      detected.push_back(buff);
+   }
+
+   return detected;
+}
+
 
 
 int main(int argc, char* argv[]){
-   CameraParams par(2, 1024, 768);
+   CameraParams par(0, 1024, 768);
    Camera camera(par);
 
    printInfo(par);
@@ -117,5 +149,10 @@ int main(int argc, char* argv[]){
       }
    }
 
+   cv::Mat img = cv::imread("/home/nanzat/aruco_images/1.jpg");
+   
+   std::vector<Mark> detected = detectMarks(img);
+   std::cout<<detected.size()<<std::endl;
+   std::cout<<detected[0].id<<std::endl<<detected[0].corners<<std::endl;
    return 0;
 }
