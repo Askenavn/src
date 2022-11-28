@@ -98,17 +98,16 @@ public:
 
 };
 
-struct Mark{
-   int id;
-   std::vector<cv::Point2f> corners;
+struct Marks{
+   std::vector<int> ids;
+   std::vector<std::vector<cv::Point2f>> corners;
 
-   Mark(int markerId, std::vector<cv::Point2f> pts):
-   id(markerId), corners(pts){
+   Marks(std::vector<int> id, std::vector<std::vector<cv::Point2f>> corner):
+   ids(id), corners(corner){
    }
-
 };
 
-std::vector<Mark> detectMarks(cv::Mat frame){
+Marks detectMarks(cv::Mat frame){
    std::vector<int> markerIds;
    std::vector<std::vector<cv::Point2f>> markerCorners;
 
@@ -117,11 +116,8 @@ std::vector<Mark> detectMarks(cv::Mat frame){
 
    cv::aruco::detectMarkers(frame, dictionary, markerCorners, markerIds, parameters);
 
-   std::vector<Mark> detected;
-   for(int i=0; i < 4; i++){
-      Mark buff(markerIds[i], markerCorners[i]);
-      detected.push_back(buff);
-   }
+   Marks detected(markerIds, markerCorners);
+
 
    return detected;
 }
@@ -151,8 +147,18 @@ int main(int argc, char* argv[]){
 
    cv::Mat img = cv::imread("/home/nanzat/aruco_images/1.jpg");
    
-   std::vector<Mark> detected = detectMarks(img);
-   std::cout<<detected.size()<<std::endl;
-   std::cout<<detected[0].id<<std::endl<<detected[0].corners<<std::endl;
+   Marks detected = detectMarks(img);
+   std::cout<<detected.ids.size()<<std::endl;
+   std::cout<<detected.ids[0]<<std::endl<<detected.corners[0]<<std::endl;
+
+   cv::imshow(" ", img);
+   cv::waitKey(0);
+   cv::destroyWindow(" ");
+
+   cv::Mat detMarks = img.clone();
+   cv::aruco::drawDetectedMarkers(detMarks, detected.corners, detected.ids);
+   cv::imshow("detected markers", detMarks);
+   cv::waitKey(0);
+   cv::destroyWindow("detected markers");
    return 0;
 }
