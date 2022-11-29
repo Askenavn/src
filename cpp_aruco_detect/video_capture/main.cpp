@@ -7,6 +7,7 @@
 #include <opencv2/imgproc/imgproc.hpp>
 #include <stdio.h>
 #include <opencv2/aruco.hpp>
+#include "aruco_samples_utility.hpp"
 
  
 
@@ -53,9 +54,9 @@ cv::Mat setCamMat(std::array<std::array<double, 3>, 3> mtx){
    return camMatrix;
 }
 
-void readParams(std::string file, cv::Mat &mtx, cv::Mat &dist){
+bool readParams(std::string file, cv::Mat &mtx, cv::Mat &dist){
    bool success = readCameraParameters(file, mtx, dist);
-
+   return success;
 }
 
 class Camera{
@@ -105,6 +106,8 @@ public:
 struct Marks{
    std::vector<int> ids;
    std::vector<std::vector<cv::Point2f>> corners;
+   std::vector<cv::Vec3d> rvecs;
+   std::vector<cv::Vec3d> tvecs;
 
    
    void detectMarks(cv::Mat frame){
@@ -126,9 +129,16 @@ struct Marks{
       return frame;      
    }
 
-   cv::Mat drawAxis(cv::Mat frame){
+   void getVectors(cv::Mat cameraMatrix, cv::Mat distCoeffs){
+      cv::aruco::estimatePoseSingleMarkers(corners, 0.05, cameraMatrix, distCoeffs, rvecs, tvecs);
+   }
 
-      
+   cv::Mat drawAxis(cv::Mat frame, cv::Mat cameraMatrix, cv::Mat distCoeffs){
+      cv::Mat img = frame.clone();
+      for (int i=0; i < rvecs.size(); i++){
+         cv::drawFrameAxes(img, cameraMatrix, distCoeffs, rvecs[i], tvecs[i], 0.1);
+      }
+      return img;
    }
 };
 
@@ -160,8 +170,6 @@ int main(int argc, char* argv[]){
    
    Marks detected;
    detected.detectMarks(img);
-   std::cout<<detected.ids.size()<<std::endl;
-   std::cout<<detected.ids[0]<<std::endl<<detected.corners[0]<<std::endl;
 
    cv::imshow(" ", img);
    cv::waitKey(0);
@@ -171,5 +179,19 @@ int main(int argc, char* argv[]){
    cv::imshow("detected markers", detected.drawMarks(img));
    cv::waitKey(0);
    cv::destroyWindow("detected markers");
+
+   cv::Mat cameraMatrix, distCoeffs;
+   std::string path = "camera_params.yml";
+
+   if(!readCameraParameters(path, cameraMatrix, distCoeffs)){
+      return 1;
+   }
+
+   detected.getVectors(cameraMatrix, distCoeffs);
+
+   cv::imshow("axis", detected.drawAxis(img, cameraMatrix, distCoeffs));
+   cv::waitKey(0);
+   cv::destroyWindow("axis");
+
    return 0;
 }
