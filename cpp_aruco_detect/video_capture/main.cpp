@@ -130,18 +130,48 @@ struct Marks{
    }
 
    void getVectors(cv::Mat cameraMatrix, cv::Mat distCoeffs){
-      cv::aruco::estimatePoseSingleMarkers(corners, 0.05, cameraMatrix, distCoeffs, rvecs, tvecs);
+      cv::aruco::estimatePoseSingleMarkers(corners, 0.22, cameraMatrix, distCoeffs, rvecs, tvecs);
    }
 
    cv::Mat drawAxis(cv::Mat frame, cv::Mat cameraMatrix, cv::Mat distCoeffs){
       cv::Mat img = frame.clone();
       for (int i=0; i < rvecs.size(); i++){
-         cv::drawFrameAxes(img, cameraMatrix, distCoeffs, rvecs[i], tvecs[i], 0.1);
+         cv::drawFrameAxes(img, cameraMatrix, distCoeffs, rvecs[i], tvecs[i], 0.11);
       }
       return img;
    }
-};
+   
+   std::vector<cv::Point3d> getCameraPose(){
+      std::vector<cv::Point3d> poses(ids.size());
 
+      for(int k=0; k<ids.size();k++){   
+      cv::Mat rotMat;
+      cv::Mat transMat = cv::Mat::zeros(4, 4, CV_64F);
+      cv::Rodrigues(rvecs[k], rotMat);
+
+      
+
+      for(int i=0;i<3;i++){
+         for(int j=0;j<3;j++){
+            transMat.at<double>(i,j)=rotMat.at<double>(i,j);
+         }
+      } 
+
+      transMat.at<double>(0,3) = tvecs[k](0);
+      transMat.at<double>(1,3) = tvecs[k](1);
+      transMat.at<double>(2,3) = tvecs[k](2);
+      transMat.at<double>(3,3) = 1.;
+      
+      std::cout<<tvecs[k]<<std::endl;
+      std::cout<<transMat.inv()<<std::endl;
+
+      cv::Mat invMat = transMat.inv();
+      poses[k] = cv::Point3d(invMat.at<double>(0,3), invMat.at<double>(1,3), invMat.at<double>(2,3));
+
+   }   
+      return poses;
+   }
+};
 
 
 
@@ -166,7 +196,7 @@ int main(int argc, char* argv[]){
       }
    }
 
-   cv::Mat img = cv::imread("/home/nanzat/aruco_images/1.jpg");
+   cv::Mat img = cv::imread("/home/nanzat/aruco_images/(115;75;220).jpg");
    
    Marks detected;
    detected.detectMarks(img);
@@ -192,6 +222,15 @@ int main(int argc, char* argv[]){
    cv::imshow("axis", detected.drawAxis(img, cameraMatrix, distCoeffs));
    cv::waitKey(0);
    cv::destroyWindow("axis");
+
+
+   std::vector<cv::Point3d> poses = detected.getCameraPose();
+   for(int i =0; i<4;i++){
+      std::cout<<detected.ids[i]<<std::endl<<poses[i]<<std::endl;
+   }
+   cv::imshow("detected markers", detected.drawMarks(img));
+   cv::waitKey(0);
+   cv::destroyWindow("detected markers");
 
    return 0;
 }
