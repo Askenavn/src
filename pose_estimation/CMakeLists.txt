@@ -106,7 +106,7 @@ find_package(OpenCV REQUIRED)
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
- INCLUDE_DIRS include
+ INCLUDE_DIRS include/pose_estimation
 #  LIBRARIES t
  CATKIN_DEPENDS cv_bridge
  roscpp
@@ -124,6 +124,7 @@ catkin_package(
 include_directories(
   ${catkin_INCLUDE_DIRS}
   ${OpenCV_INCLUDE_DIRS}
+  include/pose_estimation
 )
 
 ## Declare a C++ library

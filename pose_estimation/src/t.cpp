@@ -1,5 +1,4 @@
-#include "camera.cpp"
-
+#include "camera.h"
 
 int main(int argc, char* argv[]){
    CameraParams par(0, 1024, 768);
