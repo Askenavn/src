@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0.2)
-project(pose_estimation)
+project(fiducial_positioning_system)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
 # add_compile_options(-std=c++11)
@@ -106,7 +106,7 @@ find_package(OpenCV REQUIRED)
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
- INCLUDE_DIRS include/pose_estimation
+ INCLUDE_DIRS include/fiducial_positioning_system
 #  LIBRARIES t
  CATKIN_DEPENDS cv_bridge
  roscpp
@@ -124,7 +124,7 @@ catkin_package(
 include_directories(
   ${catkin_INCLUDE_DIRS}
   ${OpenCV_INCLUDE_DIRS}
-  include/pose_estimation
+        include/fiducial_positioning_system
 )
 
 ## Declare a C++ library
@@ -140,9 +140,9 @@ include_directories(
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
-add_executable(${PROJECT_NAME}_node 
-                src/t.cpp
-                src/camera.cpp)
+add_executable(${PROJECT_NAME}_node
+        src/fid_ps_node.cpp
+        src/FiducialPositioningSystem.cpp)
 
 target_link_libraries(${PROJECT_NAME}_node ${catkin_LIBRARIES} ${OpenCV_INCLUDE_DIRS})
 
