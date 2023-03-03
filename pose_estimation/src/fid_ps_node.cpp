@@ -1,17 +1,28 @@
 #include "FiducialPositioningSystem.h"
+#include <ros/ros.h>
 
-int main(){
-    VideoInput vi;
+
+
+
+#include <ros/ros.h>
+
+
+
+int main(int argc, char** argv) {
+    ros::init(argc, argv, "my_node");
+    ros::NodeHandle nh("hi");
     cv::Mat frame;
-
-
-    std::cout << "start" << std::endl;
+    VideoInput vi(nh);
+    ROS_INFO("my_node is running");
     while (1){
+        std::string sss;
+
         vi.getFrame(frame);
         if(frame.empty()) continue;
-
-        cv::imshow("Camera", frame); // отображаем текущий кадр на экране
-        if (cv::waitKey(1) == 27) break; // выход из цикла при нажатии клавиши Esc
+        cv::imshow("Camera", frame);
+        if (cv::waitKey(1) == 27) break;
+        ros::spinOnce();
     }
 
+    return 0;
 }

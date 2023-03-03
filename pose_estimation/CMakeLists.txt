@@ -12,6 +12,7 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   sensor_msgs
   std_msgs
+  dynamic_reconfigure
 )
 
 find_package(OpenCV REQUIRED)
@@ -91,10 +92,9 @@ find_package(OpenCV REQUIRED)
 ##     and list every .cfg file to be processed
 
 ## Generate dynamic reconfigure parameters in the 'cfg' folder
-# generate_dynamic_reconfigure_options(
-#   cfg/DynReconf1.cfg
-#   cfg/DynReconf2.cfg
-# )
+ generate_dynamic_reconfigure_options(
+   cfg/video_input.cfg
+ )
 
 ###################################
 ## catkin specific configuration ##
@@ -107,12 +107,10 @@ find_package(OpenCV REQUIRED)
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
  INCLUDE_DIRS include/fiducial_positioning_system
-#  LIBRARIES t
  CATKIN_DEPENDS cv_bridge
  roscpp
  sensor_msgs
  std_msgs
-#  DEPENDS system_lib
 )
 
 ###########
@@ -135,7 +133,7 @@ include_directories(
 ## Add cmake target dependencies of the library
 ## as an example, code may need to be generated before libraries
 ## either from message generation or dynamic reconfigure
-# add_dependencies(${PROJECT_NAME} ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+
 
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
@@ -144,8 +142,11 @@ add_executable(${PROJECT_NAME}_node
         src/fid_ps_node.cpp
         src/FiducialPositioningSystem.cpp)
 
+
 target_link_libraries(${PROJECT_NAME}_node ${catkin_LIBRARIES} ${OpenCV_INCLUDE_DIRS})
 
+add_dependencies(${PROJECT_NAME}_node
+                 ${PROJECT_NAME}_gencfg)
 ## Rename C++ executable without prefix
 ## The above recommended prefix causes long target names, the following renames the
 ## target back to the shorter version for ease of user use
