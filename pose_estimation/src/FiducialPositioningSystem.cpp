@@ -27,8 +27,23 @@ void VideoInput::getFrame(cv::Mat& frame) {
 
 void VideoInput::setupVideoCapture(fid_ps::VideoInputConfig& config, uint32_t level) {
     ROS_INFO("Received reconfiguration request");
-    ROS_INFO("int_param: %d", config.int_param);
-    videoCapture.set(cv::CAP_PROP_BRIGHTNESS, config.int_param);
+
+    videoCapture.set(cv::CAP_PROP_FPS, config.fps);
+    ROS_INFO("FPS: %d", (int)videoCapture.get(cv::CAP_PROP_FPS));
+
+    videoCapture.set(cv::CAP_PROP_FRAME_WIDTH, config.width);
+    videoCapture.set(cv::CAP_PROP_FRAME_HEIGHT, config.height);
+    ROS_INFO("resolution: %dx%d", (int)videoCapture.get(cv::CAP_PROP_FRAME_WIDTH),(int)videoCapture.get(cv::CAP_PROP_FRAME_HEIGHT));
+
+    videoCapture.set(cv::CAP_PROP_BRIGHTNESS, config.brightness);
+    ROS_INFO("brightness: %d", (int)videoCapture.get(cv::CAP_PROP_BRIGHTNESS));
+
+    videoCapture.set(cv::CAP_PROP_CONTRAST, config.contrast);
+    ROS_INFO("contrast: %d", (int)videoCapture.get(cv::CAP_PROP_CONTRAST));
+
+    videoCapture.set(cv::CAP_PROP_SATURATION, config.saturation);
+    ROS_INFO("saturation: %d", (int)videoCapture.get(cv::CAP_PROP_SATURATION));
+
 }
 
 
