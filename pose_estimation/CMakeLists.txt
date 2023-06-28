@@ -13,6 +13,10 @@ find_package(catkin REQUIRED COMPONENTS
   sensor_msgs
   std_msgs
   dynamic_reconfigure
+  visualization_msgs
+  tf2
+  tf2_ros
+  geometry_msgs
 )
 
 find_package(OpenCV REQUIRED)
@@ -111,6 +115,10 @@ catkin_package(
  roscpp
  sensor_msgs
  std_msgs
+ visualization_msgs
+ tf2
+ tf2_ros
+ geometry_msgs
 )
 
 ###########
