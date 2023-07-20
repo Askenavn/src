@@ -52,7 +52,7 @@ public:
 
     void detectMarks(cv::Mat frame);
     cv::Mat drawMarks(cv::Mat frame);
-    void getVectors(cv::Mat cameraMatrix, cv::Mat distCoeffs);
+    void getVectors(double sidelen, cv::Mat cameraMatrix, cv::Mat distCoeffs);
     cv::Mat drawAxis(cv::Mat frame, cv::Mat cameraMatrix, cv::Mat distCoeffs);
     std::vector<cv::Point3d> getCameraPose();
     std::vector<int> getIds();

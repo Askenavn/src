@@ -11,10 +11,10 @@ VideoInput::VideoInput(ros::NodeHandle nh, int camId):
     drServer.setCallback(boost::bind(&VideoInput::setupVideoCapture, this, _1, _2));
 
 
-    videoCapture.set(cv::CAP_PROP_FRAME_WIDTH, 1920);
-    videoCapture.set(cv::CAP_PROP_FRAME_HEIGHT, 1080);
+    videoCapture.set(cv::CAP_PROP_FRAME_WIDTH, 720);
+    videoCapture.set(cv::CAP_PROP_FRAME_HEIGHT, 480);
 
-    videoCapture.set(cv::CAP_PROP_FPS, 30);
+    videoCapture.set(cv::CAP_PROP_FPS, 20);
 }
 
 VideoInput::~VideoInput(){
@@ -88,8 +88,8 @@ cv::Mat Marks::drawMarks(cv::Mat frame){
    return frame;      
 }
 
-void Marks::getVectors(cv::Mat cameraMatrix, cv::Mat distCoeffs){
-   cv::aruco::estimatePoseSingleMarkers(this->corners, 0.175, cameraMatrix, distCoeffs, this->rvecs, this->tvecs);
+void Marks::getVectors(double sidelen, cv::Mat cameraMatrix, cv::Mat distCoeffs){
+   cv::aruco::estimatePoseSingleMarkers(this->corners, sidelen, cameraMatrix, distCoeffs, this->rvecs, this->tvecs);
 }
 
 cv::Mat Marks::drawAxis(cv::Mat frame, cv::Mat cameraMatrix, cv::Mat distCoeffs){
